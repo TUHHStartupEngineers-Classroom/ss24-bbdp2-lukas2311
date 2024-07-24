@@ -10,9 +10,9 @@ This is a template example for lab journaling. Students in the data science cour
 test1
 ## How to use
 
-1. Accept the assignment and get your own github repo.
+1. 
 
-2. Blog/journal what you are doing in R, by editing the `.qmd` files. 
+2.  
 
 3. See the links page for lots of helpful links on learning R.
 

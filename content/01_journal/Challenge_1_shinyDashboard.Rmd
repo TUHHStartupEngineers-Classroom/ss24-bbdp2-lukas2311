@@ -1,0 +1,372 @@
+---
+title: "Sales Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(rsconnect)
+# Core
+library(tidyverse)
+
+# Interactive Visualizations
+library(plotly)
+
+# Spatial Data
+library(raster)
+library(sf)
+library(shiny)
+# Currency formatting
+source("00_scripts/plot_sales.R")
+
+```
+
+
+
+```{r}
+# Bike data
+bikes_tbl      <- readRDS("01_data/bikes_tbl.rds")
+bikeshops_tbl  <- readRDS("01_data/bikeshops_tbl.rds")
+orderlines_tbl <- readRDS("01_data/orderlines_tbl.rds")
+
+bike_orderlines_tbl <- orderlines_tbl %>%
+    left_join(bikes_tbl,     by = c("product_id" = "bike_id")) %>%
+    left_join(bikeshops_tbl, by = c("customer_id" = "bikeshop_id")) %>%
+    mutate(total_price = price_euro * quantity)
+
+
+```
+
+```{r}
+library(geodata)
+library(sp)
+library(shiny)
+library(knitr)
+library(shinyWidgets)
+
+germany_sp <- readRDS("01_data/gadm36_DEU_1_sp.rds")
+
+germany_sf <- st_as_sf(germany_sp) %>% 
+  
+                  # Add english names
+                  mutate(VARNAME_1 = ifelse(is.na(VARNAME_1), NAME_1, VARNAME_1)) 
+```
+
+Inputs {.sidebar}
+-------------------------------------
+
+Data Range
+
+```{r}
+airDatepickerInput(
+  inputId = "id",
+  label = "Select:",
+  placeholder = "Placeholder",
+  multiple = 5, 
+  clearButton = TRUE
+)
+```
+
+
+
+Bike Type
+```{r}
+
+
+checkboxGroupButtons(
+  inputId = "dataset", 
+  label = "Wähle ein Dataset:", 
+  choices = c("Mountain", "Road", "Hybrid/City", "E-Bikes", "Gravel"), 
+  selected = "cars",
+  checkIcon = list(
+    yes = icon("ok", 
+               lib = "glyphicon"),
+    no = icon("remove",
+              lib = "glyphicon")
+  )
+)
+
+
+
+```
+
+Bike Family
+```{r}
+pickerInput(
+  inputId = "dataset", 
+  label = "Wähle ein Dataset:", 
+  choices = c("cars", "pressure", "airquality"),
+  options = list(
+    `live-search` = TRUE,
+    `actions-box` = TRUE
+  ),
+  multiple = FALSE
+) 
+
+actionButton("apply", "Apply")
+actionButton("reset", "Reset")
+
+print(input$dataset)
+```
+
+
+Column {data-width=350}
+-------------------------------------
+
+### Chart 1
+
+```{r, echo=FALSE}
+
+total_orders <- bike_orderlines_tbl %>%
+  summarise(total_orders = n_distinct(order_id))
+
+# Verkaufsumsätze extrahieren
+total_sales <- bike_orderlines_tbl %>%
+  summarise(total_sales = sum(total_price))
+
+ratio <- bike_orderlines_tbl %>%
+    filter(category_1 %in% c(category_1, category_2)) %>%
+    group_by(category_1) %>%
+    summarise(total_sales = sum(total_price)) %>%
+    pivot_wider(names_from = category_1, values_from = total_sales, names_prefix = "total_") %>%
+    summarise(ratio = total_Mountain / total_Road) %>%
+    pull(ratio)  # Extrahiere nur den Wert der Ratio
+
+print(ratio)
+```
+
+
+```{r}
+valueBox(value = total_orders, caption = "Orders", icon = icon("heart"), color = "green")
+valueBox(value = total_sales/1000000, caption = "Sales", icon = icon("dollar"), color = "blue")
+valueBox(value = ratio, caption = "Ratio, Mountain to Road", icon = icon("balance-scale"), color = "purple")
+```
+
+
+
+
+
+```{r}
+renderText({
+  paste("Der eingegebene Wert ist:", input$total_orders)
+})
+```
+
+
+
+### By State
+```{r}
+geo_plot_tbl <- bike_orderlines_tbl %>% 
+                  group_by(state) %>%
+                  summarise(total_revenue = sum(total_price)) %>%
+                  ungroup() %>%
+                  right_join(germany_sf, by = c("state" = "VARNAME_1")) %>% 
+                  mutate(total_revenue = ifelse(is.na(total_revenue), 0, total_revenue)) %>% 
+                  mutate(label_text = str_glue("State: {state}
+                                         Revenue: {format_to_euro(total_revenue)}")) %>% 
+                  # Convert back to an sf object, that can be plotted
+                  st_as_sf()
+```
+
+```{r}
+plot_ly(geo_plot_tbl, 
+        split      = ~NAME_1, 
+        color      = ~total_revenue,
+        colors     = "Blues",
+        stroke     = I("black"),
+        hoverinfo  = 'text', 
+        text       = ~label_text, 
+        hoveron    = "fills", 
+        showlegend = FALSE) 
+```
+
+Column {data-height=350, data-width=400,  .tabset}
+-------------------------------------
+
+Time Unit
+
+### D
+```{r}
+
+print("hier ist tabset 2")
+```
+
+### W
+```{r}
+
+total_sales_m_tbl <- bike_orderlines_tbl %>%
+
+  dplyr::select(order_date, total_price) %>%
+
+  mutate(date_rounded = floor_date(order_date, unit = "week")) %>%
+
+  group_by(date_rounded) %>%
+  summarise(total_sales = sum(total_price)) %>%
+  ungroup() %>%
+
+  mutate(label_text = str_glue("Sales: {format_to_euro(total_sales)}
+                                 Date: {date_rounded %>% format('%B %Y')}"))
+
+
+g1 <- total_sales_m_tbl %>%
+  ggplot(aes(x = date_rounded, y = total_sales)) +
+
+  # Geoms
+  geom_point() +
+  geom_smooth(method = "loess", span = 0.2) +
+
+  # Formatting
+  
+  # Convert scale to euro format
+  scale_y_continuous(labels = euro_format()) +
+  
+  # Make sure 0 will always be shown (even if the data is far away)
+  expand_limits(y = 0) +
+  
+  labs(
+    title = "Total Sales",
+    y = "Revenue (EUR)",
+    x = ""
+  )
+
+g1
+```
+
+### M
+```{r}
+
+total_sales_m_tbl <- bike_orderlines_tbl %>%
+
+  dplyr::select(order_date, total_price) %>%
+
+  mutate(date_rounded = floor_date(order_date, unit = "month")) %>%
+
+  group_by(date_rounded) %>%
+  summarise(total_sales = sum(total_price)) %>%
+  ungroup() %>%
+
+  mutate(label_text = str_glue("Sales: {format_to_euro(total_sales)}
+                                 Date: {date_rounded %>% format('%B %Y')}"))
+
+
+g1 <- total_sales_m_tbl %>%
+  ggplot(aes(x = date_rounded, y = total_sales)) +
+
+  # Geoms
+  geom_point() +
+  geom_smooth(method = "loess", span = 0.2) +
+
+  # Formatting
+  
+  # Convert scale to euro format
+  scale_y_continuous(labels = euro_format()) +
+  
+  # Make sure 0 will always be shown (even if the data is far away)
+  expand_limits(y = 0) +
+  
+  labs(
+    title = "Total Sales",
+    y = "Revenue (EUR)",
+    x = ""
+  )
+
+g1
+```
+
+### Q
+```{r}
+
+total_sales_m_tbl <- bike_orderlines_tbl %>%
+  dplyr::select(order_date, total_price) %>%
+
+  mutate(date_rounded = floor_date(order_date, unit = "quarter")) %>%
+
+  group_by(date_rounded) %>%
+  summarise(total_sales = sum(total_price)) %>%
+  ungroup() %>%
+
+  mutate(label_text = str_glue("Sales: {format_to_euro(total_sales)}
+                                 Date: {date_rounded %>% format('%B %Y')}"))
+
+
+g1 <- total_sales_m_tbl %>%
+  ggplot(aes(x = date_rounded, y = total_sales)) +
+
+  # Geoms
+  geom_point() +
+  geom_smooth(method = "loess", span = 0.2) +
+
+  # Formatting
+  
+  # Convert scale to euro format
+  scale_y_continuous(labels = euro_format()) +
+  
+  # Make sure 0 will always be shown (even if the data is far away)
+  expand_limits(y = 0) +
+  
+  labs(
+    title = "Total Sales",
+    y = "Revenue (EUR)",
+    x = ""
+  )
+
+g1
+```
+
+### Y
+```{r}
+
+# Funktion zum Formatieren in Euro
+format_to_euro <- function(x) {
+  scales::label_dollar(prefix = "€", suffix = "", big.mark = ".", decimal.mark = ",")(x)
+}
+
+# Aggregation nach Jahr
+total_sales_y_tbl <- bike_orderlines_tbl %>%
+
+  dplyr::select(order_date, total_price) %>%
+
+  mutate(date_rounded = floor_date(order_date, unit = "year")) %>%
+
+  group_by(date_rounded) %>%
+  summarise(total_sales = sum(total_price)) %>%
+  ungroup() %>%
+
+  mutate(label_text = str_glue("Sales: {format_to_euro(total_sales)}
+                                 Date: {date_rounded %>% format('%Y')}"))
+
+# Erstellung des Diagramms
+g1 <- total_sales_y_tbl %>%
+  ggplot(aes(x = date_rounded, y = total_sales)) +
+
+  # Geoms
+  geom_point() +
+  geom_smooth(method = "loess", span = 0.2) +
+
+  # Formatting
+  
+  # Convert scale to euro format
+  scale_y_continuous(labels = euro_format()) +
+  
+  # Make sure 0 will always be shown (even if the data is far away)
+  expand_limits(y = 0) +
+  
+  labs(
+    title = "Total Sales",
+    y = "Revenue (EUR)",
+    x = ""
+  )
+
+# Plot anzeigen
+g1
+```
+
+
+
+
+
+
+
