@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "My Lab Journal",
     "section": "",
-    "text": "This is a template example for lab journaling. Students in the data science courses at the Institute of Entrepreneurship will use this template to learn R for business analytics. Students can replace this text as they wish. test1 ## How to use\n\nAccept the assignment and get your own github repo.\nBlog/journal what you are doing in R, by editing the .qmd files.\nSee the links page for lots of helpful links on learning R.\nChange everything to make it your own.\nMake sure to render you website everytime before you want to upload changes"
+    "text": "This is a template example for lab journaling. Students in the data science courses at the Institute of Entrepreneurship will use this template to learn R for business analytics. Students can replace this text as they wish. test1 ## How to use\n\n\n\nSee the links page for lots of helpful links on learning R.\nChange everything to make it your own.\nMake sure to render you website everytime before you want to upload changes"
   },
   {
     "objectID": "content/02_notes/05_class_notes.html",
@@ -14,9 +14,16 @@
     "text": "IMPORTANT: You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.\nThis is an .qmd file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a # in front of your text, it will create a top level-header."
   },
   {
-    "objectID": "content/01_journal/03_data_wrangling.html",
-    "href": "content/01_journal/03_data_wrangling.html",
-    "title": "Data Wrangling",
+    "objectID": "content/01_journal/04_data_visualization.html",
+    "href": "content/01_journal/04_data_visualization.html",
+    "title": "Data Visualization",
+    "section": "",
+    "text": "Note\n\n\n\nYou can delete everything in here and start fresh."
+  },
+  {
+    "objectID": "content/01_journal/02_data_acquisition.html",
+    "href": "content/01_journal/02_data_acquisition.html",
+    "title": "Data Acquisition",
     "section": "",
     "text": "Note\n\n\n\nYou can delete everything in here and start fresh."
   },
@@ -35,18 +42,60 @@
     "text": "2.1 Header 2\n\nHeader 3\n\nHeader 4\n\nHeader 5\n\nHeader 6"
   },
   {
-    "objectID": "content/01_journal/02_data_acquisition.html",
-    "href": "content/01_journal/02_data_acquisition.html",
-    "title": "Data Acquisition",
+    "objectID": "content/01_journal/03_data_wrangling.html",
+    "href": "content/01_journal/03_data_wrangling.html",
+    "title": "Data Wrangling",
     "section": "",
     "text": "Note\n\n\n\nYou can delete everything in here and start fresh."
   },
   {
-    "objectID": "content/01_journal/04_data_visualization.html",
-    "href": "content/01_journal/04_data_visualization.html",
-    "title": "Data Visualization",
+    "objectID": "content/01_journal/reporting_rmarkdown.html",
+    "href": "content/01_journal/reporting_rmarkdown.html",
+    "title": "Reporting with RMarkdown",
     "section": "",
-    "text": "Note\n\n\n\nYou can delete everything in here and start fresh."
+    "text": "Is amazing.\n\n\n\n\nHTML Reports & PDF Reports\nHTML Slide Decks & PowerPoint\nInteractive Dashboards\nBooks with bookdown\nWebsites with blogdown\n\n\n\n\n\nRMarkdown Website with Gallery\nKey Reference: RMarkdown - The Definitive Guide\nPDF Printing Setup: tinytex\n\n\n# PDF Knitting Setup: https://yihui.name/tinytex/ \n#install.packages(\"tinytex\")\n#tinytex::install_tinytex()"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#what-can-rmarkdown-be-used-for",
+    "href": "content/01_journal/reporting_rmarkdown.html#what-can-rmarkdown-be-used-for",
+    "title": "Reporting with RMarkdown",
+    "section": "",
+    "text": "HTML Reports & PDF Reports\nHTML Slide Decks & PowerPoint\nInteractive Dashboards\nBooks with bookdown\nWebsites with blogdown"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#key-resources",
+    "href": "content/01_journal/reporting_rmarkdown.html#key-resources",
+    "title": "Reporting with RMarkdown",
+    "section": "",
+    "text": "RMarkdown Website with Gallery\nKey Reference: RMarkdown - The Definitive Guide\nPDF Printing Setup: tinytex\n\n\n# PDF Knitting Setup: https://yihui.name/tinytex/ \n#install.packages(\"tinytex\")\n#tinytex::install_tinytex()"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#header-2",
+    "href": "content/01_journal/reporting_rmarkdown.html#header-2",
+    "title": "Reporting with RMarkdown",
+    "section": "3.1 Header 2",
+    "text": "3.1 Header 2\n\nHeader 3"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#tab-1",
+    "href": "content/01_journal/reporting_rmarkdown.html#tab-1",
+    "title": "Reporting with RMarkdown",
+    "section": "5.1 Tab 1",
+    "text": "5.1 Tab 1\nThis is Tab 1"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#tab-2",
+    "href": "content/01_journal/reporting_rmarkdown.html#tab-2",
+    "title": "Reporting with RMarkdown",
+    "section": "5.2 Tab 2",
+    "text": "5.2 Tab 2\nThis is Tab 2"
+  },
+  {
+    "objectID": "content/01_journal/reporting_rmarkdown.html#footnotes",
+    "href": "content/01_journal/reporting_rmarkdown.html#footnotes",
+    "title": "Reporting with RMarkdown",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nCitation for Footnote 1↩︎\nCitatin for Footnote 2↩︎"
   },
   {
     "objectID": "content/03_other/06_links.html",
