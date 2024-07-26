@@ -3,9 +3,6 @@ title: "Challenge_1_sales_report"
 author: "LukasMackel"
 date: "2024-07-17"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '2'
   html_document:
     code_folding: none
     df_print: paged
@@ -14,6 +11,9 @@ output:
     theme: flatly
     toc: yes
     toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
 ---
 
 ```{r setup, include=FALSE}
